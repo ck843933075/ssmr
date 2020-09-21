@@ -50,7 +50,7 @@ public class CustomerController {
     public Object upload(MultipartFile file , HttpServletRequest request) throws IOException {
         Map<String,Object>  map = new HashMap<String, Object>();
 
-        System.out.println("aaa git提交");
+        System.out.println("测试");
         //文件原始名称
         String originalFilename = file.getOriginalFilename();
 
