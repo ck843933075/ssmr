@@ -49,8 +49,8 @@ public class CustomerController {
     @ResponseBody
     public Object upload(MultipartFile file , HttpServletRequest request) throws IOException {
         Map<String,Object>  map = new HashMap<String, Object>();
-
         System.out.println("aaa");
+        System.out.println("aaabbb");
         //文件原始名称
         String originalFilename = file.getOriginalFilename();
 
