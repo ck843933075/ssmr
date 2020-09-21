@@ -51,6 +51,7 @@ public class CustomerController {
         Map<String,Object>  map = new HashMap<String, Object>();
         System.out.println("aaa");
         System.out.println("aaabbb");
+        System.out.println("bbb");
         //文件原始名称
         String originalFilename = file.getOriginalFilename();
 
