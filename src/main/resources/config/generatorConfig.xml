@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="test" targetRuntime="MyBatis3">
+
+        <commentGenerator>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+        <!--数据库链接URL，用户名、密码 -->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/roadhelp" userId="root"
+                        password="root">
+        </jdbcConnection>
+
+        <!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，为 true时把JDBC DECIMAL
+            和 NUMERIC 类型解析为java.math.BigDecimal -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+        <!-- 生成模型的包名和位置 -->
+        <javaModelGenerator targetPackage="cn.hp.bean" targetProject="target">
+            <!--是否让schema作为包的后缀-->
+            <property name="enableSubPackages" value="false" />
+            <!--从数据库返回的值被清理前后空格-->
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+        <!-- 生成映射文件的包名和位置 -->
+        <sqlMapGenerator targetPackage="cn.hp.mapper"  targetProject="target">
+            <property name="enableSubPackages" value="false" />
+        </sqlMapGenerator>
+        <!-- 生成Mapper接口类位置 -->
+        <javaClientGenerator type="XMLMAPPER"  targetPackage="cn.hp.mapper" targetProject="target">
+            <property name="enableSubPackages" value="false" />
+        </javaClientGenerator>
+
+        <!-- 客户表-->
+        <table tableName="customer" domainObjectName="Customer"></table>
+        <!--客服表-->
+        <table tableName="customer_service" domainObjectName="Waiter"></table>
+        <!--技师表-->
+        <table tableName="master" domainObjectName="Master"></table>
+        <!--技师地址表-->
+        <table tableName="master_address" domainObjectName="MasterAddress"></table>
+        <!--订单表-->
+        <table tableName="orders" domainObjectName="Order"></table>
+       
+
+    </context>
+</generatorConfiguration>

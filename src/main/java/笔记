@@ -1,0 +1,79 @@
+
+
+1. 首先进入 前台 手机端的 主页 (地图 + 订单提交功能的页面)
+
+2. 计算 价格
+
+3. 登陆 及 提交 订单
+
+
+上次内容到: 提交订单到后台 (作业)
+
+
+后台 : 订单列表显示 +分页 ;  订单的添加
+
+
+customer: 客户表
+customer_service: 客服表
+master: 维修师
+master_address: 维修师的 地点
+orders : 订单表
+
+
+1. 显示后台订单列表
+    需要客户登陆 -- 才显示
+    /html/customerService/login.html 登录页
+
+    /html/customerService/back.html     后台主页
+
+2.back.html 中:   <iframe name="frame" src="../order/selectList"
+    该链接 跳转到 /html/orders/table.html
+
+
+
+
+
+指派订单
+    "刚下单" -- 要修改订单的状态 --"已接单" / 还需要修改 维修工的状态 为 "在忙"
+
+    维修工 , 微信公众号登陆的 -- 微信小程序中 ,修改 订单状态 --传入到后台
+
+
+
+    收集上次作业 提交
+
+    今天作业:
+        修改状态/ 修改订单/ 解除订单(方案一: 直接删除 ; 方案二:修改 订单表状态 为"已撤销" , 同时解除绑定当前订单的维修工--状态为 空闲)
+
+
+Workbook wb = new HSSFWorkbook();   代表创建了一个 xls 对象
+
+sheet  代表 Excel中 每一个页签 (默认有3个页签)
+
+Row  代表 每一行
+cell  代表每一行中的 小的单元格
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

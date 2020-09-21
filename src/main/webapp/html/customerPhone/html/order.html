@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,u ser-scalable=no">
+		<link rel="stylesheet" type="text/css" href="../css/reset.css"/>
+		<script type="text/javascript" src="../js/jquery-3.2.1.js"></script>
+		<title>我的订单</title>
+		<style type="text/css">
+			.order { position: relative;width: 94%;height: 2.1rem;background: #EFEFEF;margin: 0rem auto 0.2rem;padding-top: 0.2rem;border-radius: 0.1rem; }
+			.order p { font-size: 0.3rem;line-height: 0.5rem;padding-left: 0.2rem;position: relative;z-index: 2; }
+			img { width: 1.8rem;position: absolute;right: 0.2rem;top: 0.2rem; }
+			span { display: inline-block;position: absolute;right: 0.2rem;font-size: 0.28rem;bottom: 0.2rem; }
+		</style>
+	</head>
+	<body>
+		<br />
+		<div id="order">
+		</div>
+	</body>
+	<script type="text/javascript">
+	var order = "";
+	$.ajax({
+		url:"/SSMR/order/selectListByPhone",
+		type : 'get',
+		dataType:'json',
+		success : function(data) {
+			for(var i = 0;i<data.length;i++){
+				order =order + "<div class=\"order\">"+
+									"<p>联系电话："+data[i].phone+"</p>"+
+									"<p>车牌号: "+data[i].car+"</p>"+
+									"<p>地址："+data[i].address+"</p>"+
+									"<p>￥："+data[i].cost+"元</p>";
+				if(data[i].status == '5'){
+					order =  order + "<img src=\"../img/icon10.png\" alt=\"\" /></div>" ;
+				}else{
+					order =  order + "<img src=\"../img/icon9.png\" alt=\"\" /></div>" ;
+				}
+			}
+			$("#order").html(order);
+		}
+	});
+	
+	</script>
+</html>

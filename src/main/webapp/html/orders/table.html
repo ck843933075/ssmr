@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Layui</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="refresh" content="60">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../js/layui/css/layui.css"  media="all">
+</head>
+<body>
+ 	<form  class="layui-form" id="form1">
+ 	<div class="layui-form-item" style="margin-top: 10px;margin-left: 10px;">
+	    <div class="layui-input-inline">
+	      <input type="text" name="phone" id="phone" lay-verify="required" placeholder="根据手机号码查找" autocomplete="off" class="layui-input">
+		</div>
+		<div class="layui-input-inline">
+		  <select name="status" id="status" lay-verify="status" lay-filter="status">
+		 	<option selected="selected" value="">请选择状态</option>
+	      	<option value="-1">已作废</option>
+	      	<option value="0">刚下单</option>
+	      	<option value="1">已接单</option>
+	      	<option value="2">已到达</option>
+	      	<option value="3">已完成</option>
+		  </select>
+		</div>
+		<div>    
+		  	 <button id="find"  class="layui-btn" type="button" lay-filter="find"><i class="layui-icon">&#xe615;</i></button>
+		</div>
+	</div>
+ </form>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+ 
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+	<button class="layui-btn layui-btn-sm" lay-event="add">新增订单</button>
+    <button class="layui-btn layui-btn-sm" lay-event="updStatus">修改状态</button>
+    <button class="layui-btn layui-btn-sm" lay-event="sendMaster">指派订单</button>
+    <button class="layui-btn layui-btn-sm" lay-event="upd">修改订单</button>
+	<button class="layui-btn layui-btn-sm" id="excelDown" lay-event="excelDown"><i class=" layui-icon layui-icon-download-circle">Excel下载</i></button>
+  </div>
+</script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="sendMaster">派单</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="relieve">解除派单</a>
+</script>
+              
+          
+<script src="../js/layui/layui.js" charset="utf-8"></script>
+<script>
+var order = "";
+layui.use(['table','layer','form','jquery'], function(){
+  var table = layui.table
+  ,layer = layui.layer
+  ,$ = layui.jquery
+  ,form=layui.form;
+  table.render({
+    elem: '#test'
+    ,height: 'full'
+    ,url:'../order/getOrders'
+    ,method:'post'
+    ,toolbar: '#toolbarDemo'
+    ,title: '用户数据表'
+		,defaultToolbar: []
+		,limits:[5,10,15]
+		,limit:5
+    ,cellMinWidth: 80
+    ,cols: [[
+      {type: 'checkbox', fixed: 'left'}
+      ,{field:'id', title:'订单号'}
+      ,{field:'name', title:'客户', edit: 'text',templet:function (item) {
+					return item.customer.name;
+				}}
+      ,{field:'phone', title:'手机号', edit: 'text'}
+      ,{field:'createtime', title:'下单时间',templet: "<div>{{layui.util.toDateString(d.createtime,'yyyy-MM-dd HH:mm:ss')}}</div>"}
+      ,{field:'updtetime', title:'接单时间',templet:"<div>{{layui.util.toDateString(d.createtime,'yyyy-MM-dd HH:mm:ss')}}</div>",hide : 'true'}
+      ,{field:'address', title:'地址', edit: 'text'}
+      ,{field:'status', title:'状态', templet:status}
+      ,{field:'endtime', title:'结单时间',templet: "<div>{{layui.util.toDateString(d.createtime,'yyyy-MM-dd HH:mm:ss')}}</div>",hide : 'true'}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo'}
+      ,{field : 'lng',title : 'lng',hide : 'true'}
+      ,{field : 'lat',title : 'lat',hide : 'true'}
+    ]]
+    ,page: true
+    ,id : 'order'
+		,parseData: function (rs) {//数据格式解析
+			if (rs.code == 200) {
+				return {
+					"code": rs.code,
+					"msg": rs.msg,
+					"count": rs.data.total,
+					"data": rs.data.list
+				}
+			}
+
+		},
+		response: {	// 设置响应码
+			statusCode: 200 //规定成功的状态码，默认：0
+		}
+  });
+  
+  //搜索
+  $("#find").click(function(){
+       table.reload('order', {
+      	 where:{
+      		status:$("#status").val(),
+      		phone:$("#phone").val()
+      	 }
+       });
+  });
+	
+//监听行工具事件
+  table.on('tool(test)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'relieve'){
+      layer.confirm('是否解除派单', function(index){
+    	$.post("/SSMR/order/sendMaster",{"id":data.id},function(data){
+    		layer.alert("解除成功！");
+    	});
+        window.parent.location.reload();
+      });
+    }else if(obj.event === 'sendMaster'){
+    	order = data;
+    	layer.open({
+	         type: 2,
+	         skin: 'layui-layer-demo', //样式类名
+	         title: '派单',
+	         closeBtn: 1, //不显示关闭按钮
+	         anim: 2,
+	         maxmin: true,
+	         area: ['100%', '100%'],
+	         shadeClose: true, //开启遮罩关闭
+	         content: '../order/sendMaster'
+    	});
+    }
+  });
+  
+  //工具栏事件
+  table.on('toolbar(test)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+       case 'add':
+	        var data = checkStatus.data;
+		   	 layer.open({
+		         type: 2,
+		         skin: 'layui-layer-demo', //样式类名
+		         title: '新增',
+		         closeBtn: 1, //不显示关闭按钮
+		         anim: 2,
+		         maxmin: true,
+		         area: ['100%', '100%'],
+		         shadeClose: true, //开启遮罩关闭
+		         content: '../order/add'
+		     });
+	      	 break;
+       case 'sendMaster':
+	    	   var data = checkStatus.data;
+		       if(data.length!=1){
+		    	   layer.msg("请选择一个订单！");
+		    	   return false;
+		       }else{
+	    	     	order = checkStatus.data[0];
+			   	 	layer.open({
+				         type: 2,
+				         skin: 'layui-layer-demo', //样式类名
+				         title: '派单',
+				         closeBtn: 1, //不显示关闭按钮
+				         anim: 2,
+				         maxmin: true,
+				         area: ['100%', '100%'],
+				         shadeClose: true, //开启遮罩关闭
+				         content: '../order/sendMaster'
+			     	});
+		      }
+	      	  break;
+      	case 'updStatus':
+	        order = checkStatus.data;
+	 	   	layer.open({
+	 	         type: 2,
+	 	         skin: 'layui-layer-demo', //样式类名
+	 	         title: '修改',
+	 	         closeBtn: 1, //不显示关闭按钮
+	 	         anim: 2,
+	 	         maxmin: true,
+	 	         area: ['30%', '30%'],
+	 	         shadeClose: true, //开启遮罩关闭
+	 	         content: '../order/updStatus'
+	 	    });
+	        break;
+        case 'getCheckLength':
+           var data = checkStatus.data;
+	       if(data.length!=1){
+	    	   layer.msg("一次只能指派一个订单！");
+	    	   return false;
+	       }else{
+	    	 //弹出一个新的页面，页面跳转只能经过后台
+	        	layer.open({
+	    			type: 2, 
+	    			title:["页面"],
+	    			area: ['100%', '100%'],
+	    			maxmin:true,
+	    			scrollbar: false ,
+	    			content:'toUpdatePage'
+	    			
+	    		});
+	       }
+      break;
+      case 'isAll':
+        layer.msg(checkStatus.isAll ? '全选': '未全选')
+      break;
+      case 'upd':
+    	 order = checkStatus.data;
+  	   	 layer.open({
+  	         type: 2,
+  	         skin: 'layui-layer-demo', //样式类名
+  	         title: '修改',
+  	         closeBtn: 1, //不显示关闭按钮
+  	         anim: 2,
+  	         maxmin: true,
+  	         area: ['100%', '100%'],
+  	         shadeClose: true, //开启遮罩关闭
+  	         content: '../order/upd'
+  	     });
+        break;
+
+				/*Excel下载 */
+			case 'excelDown':
+				order = checkStatus.data;
+				layer.open({
+					type: 2,
+					skin: 'layui-layer-demo', //样式类名
+					title: '修改',
+					closeBtn: 1, //不显示关闭按钮
+					anim: 2,
+					maxmin: true,
+					area: ['100%', '100%'],
+					shadeClose: true, //开启遮罩关闭
+					content: '../order/down'
+				});
+				break;
+    };
+  });
+});
+function status(d){
+	var str="";
+	if(d.status=='-1'){
+		str="已作废";
+	}
+	if(d.status=='0'){
+		str="刚下单";
+	}
+	if(d.status=='1'){
+		str="已接单";
+	}
+	if(d.status=='2'){
+		str="已到达正在修";
+	}
+	if(d.status=='3'){
+		str="已完成";
+	}
+	if(d.status=='4'){
+		str="已评价";
+	}
+	return str;
+}
+</script>
+
+</body>
+</html>

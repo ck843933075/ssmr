@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../js/layui/css/layui.css">
+    <script type="text/javascript" src="../js/jquery-3.2.1.js"></script>
+    <style type="text/css">
+   		.container{
+	   		 width: 420px;
+	   		 height: 320px;
+			 min-height: 320px;  
+			 max-height: 320px;  
+			 position: absolute;   
+			 top: 0;  
+			 left: 0;  
+			 bottom: 0;  
+			 right: 0;  
+			 margin: auto;  
+			 padding: 20px;  
+			 z-index: 130;  
+			 border-radius: 8px;  
+			 background-color: #fff;  
+			 box-shadow: 0 3px 18px rgba(100, 0, 0, .5); 
+			 font-size: 16px;
+   		}
+   		.close{
+   			 background-color: white;
+   			 border: none;
+   			 font-size: 18px;
+   			 margin-left: 410px;
+   			 margin-top: -10px;
+   		}
+
+     	.layui-input{
+     		border-radius: 5px;
+     		width: 300px;
+     		height: 40px;
+     		font-size: 15px;
+     	}
+     	.layui-form-item{
+     		margin-left: -20px;
+     	}
+		#logoid{ 
+			margin-top: -16px;
+			padding-left:150px; 
+			padding-bottom: 15px;
+		}
+		.layui-btn{
+			margin-left: -50px;
+			border-radius: 5px;
+		    width: 350px;
+		    height: 40px;
+		    font-size: 15px;
+		}
+		.verity{
+			width: 120px;
+		}
+		.font-set{
+			font-size: 13px;
+			text-decoration: none; 
+			margin-left: 120px;
+		}
+		a:hover{
+		 	text-decoration: underline; 
+		}
+     </style>
+</head>
+<body>
+	<form class="layui-form"  id="form1">
+	<div class="container">
+			<button class="close" title="关闭">X</button>
+			<div class="layui-form-mid layui-word-aux">
+				<img id="logoid" src="../img/logo.jpg" height="35">    				
+			</div>
+			<div class="layui-form-item">
+			   <label class="layui-form-label">用户名</label>
+			   <div class="layui-input-block">
+			     <input type="text" name="account" required  lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+			   </div>
+			</div>
+		 	<div class="layui-form-item">
+		   		<label class="layui-form-label">密 &nbsp;&nbsp;码</label>
+		   <div class="layui-input-inline">
+		     	<input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+		   </div>
+		   </div>
+		   <div class="layui-form-item">
+			    <label class="layui-form-label">验证码</label>
+			    <div class="layui-input-inline">
+			     <div  style="float: left;">
+			     	<input type="text" name="verifyCode" id="verifyCode" placeholder="请输入验证码" autocomplete="off" class="layui-input verity">
+			    </div>
+			    <div  style="float: left;">
+			    	<img id="verify" onclick="chageCode()" alt="点击刷新验证码" style="width: 90%;height: 39px;" />
+			    </div>
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <div class="layui-input-block">
+			      <button class="layui-btn" type="button" id="login" lay-filter="formDemo">登陆</button>	     
+			    </div>
+			</div>
+	  <!-- <a href="" class="font-set">忘记密码?</a><a href="" class="font-set">立即注册</a> --> 
+	</div>
+</form>
+</body>
+<script type="text/javascript" src="../js/layui/layui.js"></script>
+<script>
+ 	layui.use(['form','layer','jquery'], function(){
+		var form = layui.form, 
+		$ = layui.jquery, 
+		layer = layui.layer;
+		$(document).on('click','#login',function(){
+			$.ajax({
+				url : '/SSMR/customerService/login',// 跳转到 action  
+				type : 'post',
+				data :$("#form1").serialize(),
+				success : function(data) {
+					if(data =='login'){
+						layer.alert('账号或密码错误！');
+						return;
+					}
+					window.location.href = '/SSMR/customerService/'+data;
+				},
+				error : function(error) {
+					// view("异常！");  
+				}
+			});
+		});
+ 	});
+ 	
+	function chageCode(){
+        $('#verify').attr('src','/SSMR/login/generateCheckCode?random='+new Date());//链接后添加Math.random，确保每次产生新的验证码，避免缓存问题。
+    }
+ 	chageCode();
+ 	
+</script>
+</html>

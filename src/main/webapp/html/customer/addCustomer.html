@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../js/layui/css/layui.css">
+    <script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=gXLkbXzN7kOR22S6iszA2Zfe6yIkK0s4"></script>
+</head>
+<body>
+	<form class="layui-form"  id="form1">
+	<div style="float: left;border: 0.5px;padding-top: 35px;padding-left: 100px;">
+		<div class="layui-form-item">
+		   <label class="layui-form-label">救援地址</label>
+		    <button class="layui-btn" type="button" onclick="codeAddress()" id="search" >搜索</button>
+			<div class="layui-input-inline">
+			     <input type="address" id="address" name="address"  required lay-verify="required" placeholder="救援地址" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div style="width: 500px;height: 500px;" id="allmap"></div>
+	</div>
+	<div class="container" style="float: left;margin: 150px; padding: 5px;  " >
+		 	<div class="layui-form-item">
+			   	<label class="layui-form-label">手&nbsp;机&nbsp;号</label>
+				<div class="layui-input-inline">
+				     	<input type="phone" name="phone" required lay-verify="required" placeholder="手机号" autocomplete="off" class="layui-input">
+				</div>
+		   </div>
+		<div class="layui-form-item">
+		   	<label class="layui-form-label">姓&nbsp;&nbsp;&nbsp;&nbsp;名</label>
+			<div class="layui-input-inline">
+			     	<input type="name" name="name" required lay-verify="required" placeholder="客户姓名" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+		   	<label class="layui-form-label">车&nbsp;牌&nbsp;号</label>
+			<div class="layui-input-inline">
+			     	<input type="car'" name="car" required lay-verify="required" placeholder="救援项目" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+		   	<label class="layui-form-label">救援项目</label>
+			<div class="layui-input-inline">
+			     	<input type="content" name="content" required lay-verify="required" placeholder="救援项目" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+	
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+			   <button class="layui-btn" type="button" id="login" lay-filter="formDemo">提交</button>	     
+			</div>
+		</div>
+	</div>
+	<input name="lng" id="lng" type="hidden"/>
+	<input name="lat" id="lat" type="hidden"/>
+	</form>
+</body>
+<script type="text/javascript" src="../js/layui/layui.js"></script>
+<script>
+ 	layui.use(['form','layer','jquery'], function(){
+		var form = layui.form, 
+		$ = layui.jquery, 
+		layer = layui.layer;
+		$(document).on('click','#login',function(){
+			$.ajax({
+				url : 'add',// 跳转到 action  
+				type : 'post',
+				data :$("#form1").serialize(),
+				success : function(data) {
+					if(data=='1'){
+						layer.msg("新增成功！");
+					}
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+		              parent.layer.close(index); 
+				},
+				error : function(error) {
+					// view("异常！");  
+				}
+			});
+		});
+ 	});
+</script>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");    // 创建Map实例
+	var point = new BMap.Point(113.667632,34.75413);
+	var marker2 = new BMap.Marker(point);  // 创建标注
+	map.enableScrollWheelZoom(true); 
+    map.addOverlay(marker2);
+	  // 设置地图显示的城市 此项是必须设置的
+	map.setCurrentCity("河南省郑州市火车站");   
+	map.centerAndZoom(point, 14);  // 初始化地图,设置中心点坐标和地图级别
+	map.addEventListener("click", showInfo);
+	function showInfo(e){
+		map.removeOverlay(marker2);
+		document.getElementById("lng").value=e.point.lng;
+		document.getElementById("lat").value=e.point.lat;
+        marker2 = new BMap.Marker(new BMap.Point(e.point.lng,e.point.lat)); 
+        map.addOverlay(marker2);
+	}
+	var geoc = new BMap.Geocoder();    
+	map.addEventListener("click", function(e){        
+		var pt = e.point;
+		var aa;
+		geoc.getLocation(pt, function(rs){
+			var addComp = rs.addressComponents;
+			aa = addComp.city+ addComp.district+ addComp.street+ addComp.streetNumber;
+			document.getElementById("address").value = aa;
+			var marker2 = new BMap.Marker(pt,{});  // 创建标注
+		    map.addOverlay(marker2);
+		}); 
+	}); 
+	function codeAddress() {
+        // 创建地址解析器实例
+        var myGeo = new BMap.Geocoder();
+        // 将地址解析结果显示在地图上,并调整地图视野
+        myGeo.getPoint(document.getElementById("address").value, function (point) {
+            if (point) {
+            	map.removeOverlay(marker2);
+                map.centerAndZoom(point, 14);
+                document.getElementById("lng").value = point.lng;
+                document.getElementById("lat").value = point.lat;
+                marker2 = new BMap.Marker(point); 
+                map.addOverlay(marker2);
+            } else {
+            	map.removeOverlay(marker2);
+                alert("您输入的地址在地图中未找到，请重新输入地址!");
+            }
+        }, "");
+    }
+</script>
+
+</html>

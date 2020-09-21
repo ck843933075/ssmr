@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../js/layui/css/layui.css">
+    <script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=gXLkbXzN7kOR22S6iszA2Zfe6yIkK0s4"></script>
+    <script type="text/javascript" src="../js/jquery-3.2.1.js"></script>
+</head>
+<body>
+	<form class="layui-form"  id="form1">
+		<div class="layui-form-item" style="margin-top: 30px;">
+		   	<label class="layui-form-label">订单状态</label>
+			<div class="layui-input-inline" >
+			     <select name="status" id="status">
+			      	<option value="0">刚下单</option>
+			      	<option value="3">已完成</option>
+			      	<option value="-1">作废</option>
+			      </select>
+			 </select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+			   <button class="layui-btn" type="button" id="subbtn" lay-filter="formDemo">提交</button>	     
+			</div>
+		</div>
+	</div>
+	<input name="id" id="id" type="hidden"/>
+	</form>
+</body>
+<script type="text/javascript" src="../js/layui/layui.js"></script>
+<script>
+	var order=window.parent.order[0]; 
+ 	layui.use(['form','layer','jquery'], function(){
+		var form = layui.form, 
+		$ = layui.jquery, 
+		layer = layui.layer;
+		$("#id").val(order.id);
+		$("#status").find("option:contains('"+order.status+"')").attr("selected", true);
+			$(document).on('click','#subbtn',function(){
+				$.ajax({
+				url : '/SSMR/order/upd',// 跳转到 action  
+				type : 'post',
+				data :$("#form1").serialize(),
+				success : function(data) {
+					if(data=='1'){
+						layer.msg("修改成功！");
+					}
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+		            parent.layer.close(index); 
+		            window.parent.location.reload();
+				},
+				error : function(error) {
+					// view("异常！");  
+				}
+			});
+		});
+ 	});
+ 	
+ 	
+</script>
+
+</html>

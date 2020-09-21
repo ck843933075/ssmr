@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,u ser-scalable=no">
+		<!--<script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=gXLkbXzN7kOR22S6iszA2Zfe6yIkK0s4"></script>-->
+		<script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=A30zzID7Nm83tGTTjgegr7IbzIOSjCYA"></script>
+		<link rel="stylesheet" type="text/css" href="../css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/index.css"/>
+		<script type="text/javascript" src="../js/jquery-3.2.1.js"></script>
+		<title>困境救援服务</title>
+	</head>
+	<body>
+	<!--<script type="text/javascript">
+		$.ajax({
+			url:"/login/isLogin",
+			type : 'get',
+			success : function(data) {
+				if(data=='success'){
+					$("#login").html("<img class=\"logo\" src=\"../img/icon7.png\"/><br/><span class=\"login\">查看</span>");
+				}else{
+					$("#login").html("<img class=\"logo\" src=\"../img/icon7.png\"/><br/><span class=\"login\" onclick=\"location.href='login'\">登录/注册</span>");
+				}
+			}
+		});
+	</script>-->
+	<form id="form1">
+		<!--顶部操作栏-->
+		<div class="nav">
+			<span>
+				<img src="../img/icon1.png"/>
+			</span>
+			<span class="active">搭电</span>
+			<span>拖车</span>
+			<span>换胎</span>
+			<span>紧急脱困</span>
+			<span onclick="window.location.href = 'tel://10000'">咨询
+				<img src="../img/icon2.png"/>
+			</span>
+		</div>
+		<!--地图模块-->
+		<div class="map" id="map" style="font-size: 2rem;"></div>
+		<!--地图上面的 导航页签-->
+		<div class="footer">
+			<p class="footer_title">
+				<span>搭电服务</span>，预计费用：<span>￥ <span id="money"></span> 元起</span>
+				<i onclick="$('.clover').show()">费用说明></i>
+			</p>
+			<p class="footer_address">
+				<span>●</span>
+				<span id="addressText">河南省郑州市</span>
+			</p>
+			<p class="footer_address1">
+				<span>●</span>
+				<input type="text" placeholder="请输入拖车目的地" />
+			</p>
+			<div class="addList">
+				<div>
+					<p><img src="../img/icon5.png"/> <span> 车在地库</span></p><br />
+					<p style="margin-top: 0.08rem;color: gray;">￥ 100</p>
+				</div>
+				<div>
+					<p><img src="../img/icon6.png"/> <span> 需要附轮</span></p><br />
+					<p style="margin-top: 0.08rem;color: gray;">￥ 100</p>
+				</div>
+			</div>
+			<div class="btn"  id="nextBtn">
+				提交
+			</div>
+		</div>
+		
+		<!--费用说明-->
+		<div class="clover">
+			<div>
+				<h3>拖车报价</h3>
+				<p>拖车￥198（15公里内）；超过15公里以后，10元/公里</p>
+				<p>以上收费仅包含救援服务费，救援过程中产生的费用需要您承担，如有产生费用，请在服务完成后现场支付给师傅，包含：</p>
+				<p>1.救援过程中产生的过路、过桥、停车等费用；</p>
+				<p>2.换胎如需购置轮胎，需要您承担购置费；</p>
+				<p>3.地库和加附轮各需额外支付100元费用；</p>
+				<p>取消收费规则：</p>
+				<p>1.报案成功后10分钟之内可免费取消</p>
+				<p>2.超过10分钟后师傅到达现场前，将收取基础费用的50%作为服务师傅的辛苦费；</p>
+				<p>3.师傅到达现场后，取消不退费；</p>
+				<span>24小时救援客服热线：<a href="tel:123456">123456</a></span> <br />
+				<span>服务监督电话：<a href="tel:123456">123456</a></span>
+				<img src="../img/icon4.png"  onclick="$('.clover').hide()"/>
+			</div>
+		</div>
+		
+		
+		<!--点击 首页 "头像" 的侧滑菜单-->
+		<div class="left">
+			<div class="left_main">
+				<div id="login">
+					
+				</div>
+				<p>
+					<span onclick="location.href='order'">我的订单</span>
+					<img src="../img/icon8.png"/>
+				</p>
+				<p onclick="alert('钱到位，啥事儿都好办！')">
+					<span>救援服务协议</span>
+					<img src="../img/icon8.png"/>
+				</p>
+				<p>
+					<span>救援客服热线 <a style="color: blue;position: relative;top: -0.06rem;margin-left: 0.1rem;" href="tel:110">123456</a></span>
+					<img src="../img/icon8.png"/>
+				</p>
+			</div>
+		</div>
+			<input id="address"  name="address" type="hidden" value="">
+			<input id="lng" name="lng" type="hidden" value="">
+			<input id="lat" name="lat" type="hidden" value="">
+			<input type="hidden"  name="contents" id="contents" value="搭电"/>
+			<input type="hidden"  name="attached" id="attached" value=""/>
+			<input type="hidden"  name="phone" id="phone"/>
+			<input type="hidden"  name="cost" id="cost" value="100"/>
+		</form>
+	</body>
+	<script type="text/javascript">
+		$('.nav span').click(function(){
+			var index = $(this).index();
+			if(index == 0){
+					$('.left').show();
+					$('.left_main').animate({left:'0'},200);
+				}
+			if(index == 1||index == 2||index == 3||index == 4){
+				$('.nav span').removeClass('active');
+				$('.nav span').eq(index).addClass('active');
+				$('.footer_title span').eq(0).html($(this).html()+'服务')
+				if(index == 1){
+					$('#contents').val('搭电');
+					$('.footer_address1,.addList').hide();
+				}else if(index == 3){
+					$('#contents').val('换胎');
+					$('.footer_address1,.addList').hide();
+				}else if(index == 2){
+					$('#contents').val('拖车');
+					$('.footer_address1,.addList').show();
+				}else if(index == 4){
+					$('#contents').val('紧机脱困');
+					$('.footer_address1,.addList').show();
+				}
+			}
+		})
+		
+		$('.addList div').click(function(){
+			var img = $(this).find('img').attr("src");
+			if(img == '../img/icon5.png'){
+				$('#attached').val('车在地库');
+				$(this).find('img').attr("src",'../img/icon6.png')
+			}else{
+				$('#attached').val('需要轮胎');
+				$(this).find('img').attr("src",'../img/icon5.png')
+			}
+			
+		})
+		$('.left').click(function(e){
+			$('.left_main').animate({left:'-100%'},200,function(){
+				$('.left').hide();
+			});
+		})
+		$('.left_main').click(function(e){
+			e.stopPropagation()
+		})
+	</script>
+	<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("map");    // 创建Map实例
+	//初始坐标值
+	var oldLng = 113.667632;
+	var oldLat = 34.75413;
+	var point = new BMap.Point(113.667632,34.75413);
+	var marker2 = new BMap.Marker(point);  // 创建标注
+	map.enableScrollWheelZoom(false); //滚轮开启
+    map.addOverlay(marker2);
+	  // 设置地图显示的城市 此项是必须设置的
+	map.setCurrentCity("河南省郑州市火车站");   
+	map.centerAndZoom(point, 11);  // 初始化地图,设置中心点坐标和地图级别
+	map.addEventListener("click", showInfo);
+	function showInfo(e){
+		map.removeOverlay(marker2);
+		document.getElementById("lng").value=e.point.lng;
+		document.getElementById("lat").value=e.point.lat;
+        marker2 = new BMap.Marker(new BMap.Point(e.point.lng,e.point.lat)); 
+        map.addOverlay(marker2);
+	}
+	var geoc = new BMap.Geocoder();
+		map.addEventListener("click", function(e){
+			var pt = e.point;
+			console.log(e)
+
+			var aa;
+			//获取计算金额
+			$.get("/cphone/getMoney?lng="+e.point.lng+"&lat="+e.point.lat+"&oldLng="+oldLng+"&oldLat="+oldLat,
+				function(data){
+					$("#money").html(data);  //将金额复制到 <span>中
+					$("#cost").val(data)	//同时将金额作为成本
+				});
+		//逆地址解析(将经纬度,转换为中文地址)
+		geoc.getLocation(pt, function(rs){
+			var addComp = rs.addressComponents;
+			aa = addComp.city+ addComp.district+ addComp.street+ addComp.streetNumber;
+			alert(aa)
+			document.getElementById("addressText").innerHTML = aa;
+			document.getElementById("address").value = aa;
+			//var marker2 = new BMap.Marker(pt,{});  // 创建标注
+		    map.addOverlay(marker2);
+		}); 
+	}); 
+	map.addEventListener("touchmove", function(e) {
+		map.enableDragging();
+		});
+	//触摸结束始，禁止拖拽
+	map.addEventListener("touchend", function(e) {
+		map.disableDragging();
+	});
+	function codeAddress() {
+        // 创建地址解析器实例
+        var myGeo = new BMap.Geocoder();
+        // 将地址解析结果显示在地图上,并调整地图视野
+        myGeo.getPoint(document.getElementById("address").value, function (point) {
+            if (point) {
+            	map.removeOverlay(marker2);
+                map.centerAndZoom(point, 14);
+                document.getElementById("lng").value = point.lng;
+                document.getElementById("lat").value = point.lat;
+                marker2 = new BMap.Marker(point); 
+                map.addOverlay(marker2);
+            } else {
+            	map.removeOverlay(marker2);
+                alert("您输入的地址在地图中未找到，请重新输入地址!");
+            }
+        }, "");
+    }
+</script>
+<script type="text/javascript">
+	//当点击 ==手机页面-- "提交按钮时" 查看session中是否有当前手机号信息
+	$("#nextBtn").click(function(){
+		$.ajax({
+			url:"/cphone/isLogin",
+			type : 'get',
+			success : function(data) {
+				alert(data)
+				if(data==='success'){
+					put();
+				}else{
+					alert("还未登陆，请先登陆");
+					location.href = "/cphone/to_login";	//进入客户手机登陆的页面
+				}
+			}
+		});
+	});
+
+	//如果session中有用户数据 ,则订单 提交到后台
+	function put(){
+		$.ajax({
+			url:"/order/add",
+			type : 'post',
+			data:$("#form1").serialize(),
+			success : function(data) {
+				if(data === ''){
+					alert("已下订单，请稍后！");
+					location.href = "order";
+				}else{
+					alert(data);
+				}
+			}
+		});
+	}
+</script>
+
+
+</html>
